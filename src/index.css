@@ -6,6 +6,10 @@ body {
   ol, ul {
     padding-left: 30px;
   }
+
+  .selected-item {
+    font-weight: bold
+  }
   
   .board-row:after {
     clear: both;
