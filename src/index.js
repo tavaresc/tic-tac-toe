@@ -3,18 +3,20 @@ import ReactDOM from 'react-dom'
 import './index.css'
 
 function Square(props) {
+  const className = props.winner ? 'winner-square' : 'square'
   return (
-    <button className="square" onClick={props.onClick}>
+    <button className={className} onClick={props.onClick}>
       {props.value}
     </button>
   )
 }
 
 class Board extends React.Component {
-  renderSquare(i) {
+  renderSquare(isWinnerSquare, i) {
     return (
       <Square
         value={this.props.squares[i]}
+        winner={isWinnerSquare}
         onClick={() => this.props.onClick(i)}
       />
     )
@@ -26,7 +28,8 @@ class Board extends React.Component {
     for (let i = 0; i < boardSize; i++) {
       let row = []
       for (let j = 0; j < boardSize; j++) {
-        row.push(this.renderSquare(i * boardSize + j))
+        const squareIndex = i * boardSize + j
+        row.push(this.renderSquare(this.props.winnerSquares.includes(squareIndex), squareIndex))
       }
       board.push(<div className="board-row">{row}</div>)
     }
@@ -34,11 +37,7 @@ class Board extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        {this.drawBoard()}
-      </div>
-    )
+    return <div>{this.drawBoard()}</div>
   }
 }
 
@@ -54,7 +53,8 @@ class Game extends React.Component {
         }
       ],
       stepNumber: 0,
-      xIsNext: true
+      xIsNext: true,
+      isDescendingSorted: true
     }
   }
 
@@ -66,7 +66,7 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1)
     const current = history[history.length - 1]
     const squares = current.squares.slice()
-    if (calculateWinner(squares)) return
+    if (calculateWinner(squares).winnerSymbol) return
     squares[i] = this.nextPlayer()
     this.setState({
       history: history.concat([{ squares: squares, squareIndex: i }]),
@@ -82,13 +82,17 @@ class Game extends React.Component {
     })
   }
 
+  sortMoves() {
+    this.setState({ isDescendingSorted: !this.state.isDescendingSorted })
+  }
+
   render() {
     const history = this.state.history
     const stepNumber = this.state.stepNumber
     const current = history[stepNumber]
-    const winner = calculateWinner(current.squares)
+    const {winnerSquares, winnerSymbol} = calculateWinner(current.squares)
     const moves = history.map((step, move) => {
-      const descendent = move ? 'Go to move #' + move : 'Go to game start'
+      const desc = move ? 'Go to move #' + move : 'Go to game start'
       const col = step.squareIndex > -1 ? step.squareIndex % 3 : 'col'
       const row =
         step.squareIndex > -1 ? Math.floor(step.squareIndex / 3) : 'row'
@@ -99,24 +103,28 @@ class Game extends React.Component {
             className={move === stepNumber ? 'selected-item' : ''}
             onClick={() => this.jumpTo(move)}
           >
-            {descendent} ({col}, {row})
+            {desc} ({col}, {row})
           </button>
         </li>
       )
     })
 
-    let status = winner
-      ? 'Winner: ' + winner
+    let status = winnerSymbol
+      ? 'Winner: ' + winnerSymbol
       : 'Next player: ' + this.nextPlayer()
 
+    const isDescendingSorted = this.state.isDescendingSorted
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={current.squares} onClick={i => this.handleClick(i)} />
+          <Board squares={current.squares} winnerSquares={winnerSquares} onClick={i => this.handleClick(i)} />
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <button onClick={() => this.sortMoves()}>
+            {isDescendingSorted ? 'Ascending sort' : 'Descending sort'}
+          </button>
+          <ol>{isDescendingSorted ? moves : moves.reverse()}</ol>
         </div>
       </div>
     )
@@ -137,7 +145,7 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i]
     if (squares[a] === squares[b] && squares[b] === squares[c]) {
-      return squares[a]
+      return {winnerSquares: lines[i], winnerSymbol: squares[a]}
     }
   }
   return null
