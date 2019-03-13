@@ -51,7 +51,7 @@ body {
     width: 34px;
   }
   
-  .square:focus {
+  .square:focus, .winner-square:focus {
     outline: none;
   }
   

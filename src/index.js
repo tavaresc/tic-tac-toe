@@ -29,7 +29,10 @@ class Board extends React.Component {
       let row = []
       for (let j = 0; j < boardSize; j++) {
         const squareIndex = i * boardSize + j
-        row.push(this.renderSquare(this.props.winnerSquares.includes(squareIndex), squareIndex))
+        const isWinnerSquare = this.props.winnerSquares
+          ? this.props.winnerSquares.includes(squareIndex)
+          : false
+        row.push(this.renderSquare(isWinnerSquare, squareIndex))
       }
       board.push(<div className="board-row">{row}</div>)
     }
@@ -66,7 +69,9 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1)
     const current = history[history.length - 1]
     const squares = current.squares.slice()
-    if (calculateWinner(squares).winnerSymbol) return
+    const aux = calculateWinner(squares).winnerSymbol
+
+    if (aux) return
     squares[i] = this.nextPlayer()
     this.setState({
       history: history.concat([{ squares: squares, squareIndex: i }]),
@@ -90,7 +95,8 @@ class Game extends React.Component {
     const history = this.state.history
     const stepNumber = this.state.stepNumber
     const current = history[stepNumber]
-    const {winnerSquares, winnerSymbol} = calculateWinner(current.squares)
+    const { winnerSquares, winnerSymbol } = calculateWinner(current.squares)
+
     const moves = history.map((step, move) => {
       const desc = move ? 'Go to move #' + move : 'Go to game start'
       const col = step.squareIndex > -1 ? step.squareIndex % 3 : 'col'
@@ -109,15 +115,23 @@ class Game extends React.Component {
       )
     })
 
-    let status = winnerSymbol
-      ? 'Winner: ' + winnerSymbol
-      : 'Next player: ' + this.nextPlayer()
+    const maxStepNumber = history[0].squares.length
+    let status
+    if (winnerSymbol) status = 'Winner: ' + winnerSymbol
+    else {
+      if (stepNumber === maxStepNumber) status = 'Draw result'
+      else status = 'Next player: ' + this.nextPlayer()
+    }
 
     const isDescendingSorted = this.state.isDescendingSorted
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={current.squares} winnerSquares={winnerSquares} onClick={i => this.handleClick(i)} />
+          <Board
+            squares={current.squares}
+            winnerSquares={winnerSquares}
+            onClick={i => this.handleClick(i)}
+          />
         </div>
         <div className="game-info">
           <div>{status}</div>
@@ -145,10 +159,14 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i]
     if (squares[a] === squares[b] && squares[b] === squares[c]) {
-      return {winnerSquares: lines[i], winnerSymbol: squares[a]}
+      const winnerSymbol = squares[a]
+      return {
+        winnerSquares: winnerSymbol ? lines[i] : null,
+        winnerSymbol: winnerSymbol
+      }
     }
   }
-  return null
+  return { winnerSquares: null, winnerSymbol: null }
 }
 
 // ========================================
