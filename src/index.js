@@ -69,9 +69,8 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1)
     const current = history[history.length - 1]
     const squares = current.squares.slice()
-    const aux = calculateWinner(squares).winnerSymbol
 
-    if (aux) return
+    if (calculateWinner(squares).winnerSymbol) return
     squares[i] = this.nextPlayer()
     this.setState({
       history: history.concat([{ squares: squares, squareIndex: i }]),
@@ -116,12 +115,11 @@ class Game extends React.Component {
     })
 
     const maxStepNumber = history[0].squares.length
-    let status
-    if (winnerSymbol) status = 'Winner: ' + winnerSymbol
-    else {
-      if (stepNumber === maxStepNumber) status = 'Draw result'
-      else status = 'Next player: ' + this.nextPlayer()
-    }
+    const status = winnerSymbol
+      ? 'Winner: ' + winnerSymbol
+      : stepNumber === maxStepNumber
+      ? 'Draw result'
+      : 'Next player: ' + this.nextPlayer()
 
     const isDescendingSorted = this.state.isDescendingSorted
     return (
