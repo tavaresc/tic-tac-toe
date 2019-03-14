@@ -1,17 +1,19 @@
 import * as React from 'react'
 import './index.css'
-import Square from './Square'
+import { Square } from './Square'
 
 export interface Props {
-  squares: Array<number | undefined>
-  winner: Boolean
+  squares: Array<string | undefined>
+  winnerSquares: Array<number> | undefined
   onClick(index: number): void
 }
 
 class Board extends React.Component<Props> {
-  renderSquare(isWinnerSquare: Boolean, i: number) {
+  renderSquare(isWinnerSquare: boolean, i: number) {
+    console.log('i ', i)
     return (
       <Square
+        reactKey={'square' + i}
         value={this.props.squares[i]}
         winner={isWinnerSquare}
         onClick={() => this.props.onClick(i)}
@@ -31,7 +33,7 @@ class Board extends React.Component<Props> {
           : false
         row.push(this.renderSquare(isWinnerSquare, squareIndex))
       }
-      board.push(<div className="board-row">{row}</div>)
+      board.push(<div key={'row' + i} className="board-row">{row}</div>)
     }
     return board
   }
@@ -41,4 +43,4 @@ class Board extends React.Component<Props> {
   }
 }
 
-export default Board
+export { Board }

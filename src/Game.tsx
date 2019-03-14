@@ -1,38 +1,50 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import './index.css'
-import Board from './Board'
+import { Board } from './Board'
 
 export type HistoryElem = {
-  squares: Array<number | undefined>
+  squares: Array<string | undefined>
   squareIndex: number
 }
 
-export interface Props {
+export type State = {
   history: Array<HistoryElem>
   stepNumber: number
-  xIsNext: Boolean
-  isDescendingSorted: Boolean
+  xIsNext: boolean
+  isDescendingSorted: boolean
 }
 
-class Game extends React.Component {
-  constructor(props: Game) {
-    /* Calling 'super' is mandatory in a constructor of a subclass */
-    super(props)
-    this.state = {
-      history: [
-        {
-          squares: Array(9).fill(undefined),
-          squareIndex: -1
-        }
-      ],
-      stepNumber: 0,
-      xIsNext: true,
-      isDescendingSorted: true
-    }
+class Game extends React.Component<{}, State> {
+  state: Readonly<State> = {
+    history: [
+      {
+        squares: [],
+        squareIndex: -1
+      }
+    ],
+    stepNumber: 0,
+    xIsNext: true,
+    isDescendingSorted: true
   }
 
-  nextPlayer(): String {
+  // constructor(props: Game) {
+  //   /* Calling 'super' is mandatory in a constructor of a subclass */
+  //   super(props)
+  //   this.state = {
+  //     history: [
+  //       {
+  //         squares: Array(9).fill(undefined),
+  //         squareIndex: -1
+  //       }
+  //     ],
+  //     stepNumber: 0,
+  //     xIsNext: true,
+  //     isDescendingSorted: true
+  //   }
+  // }
+
+  nextPlayer(): string {
     return this.state.xIsNext ? 'X' : 'O'
   }
 
@@ -65,7 +77,7 @@ class Game extends React.Component {
     const history = this.state.history
     const stepNumber = this.state.stepNumber
     const current = history[stepNumber]
-    const { winnerSquares, winnerSymbol } = calculateWinner(current.squares)
+    const { winnerSquares, winnerSymbol } = calculateWinner(current.squares as string[])
 
     const moves = history.map((step, move) => {
       const desc = move ? 'Go to move #' + move : 'Go to game start'
@@ -116,10 +128,10 @@ class Game extends React.Component {
 
 type Winner = {
   winnerSquares: Array<number> | undefined
-  winnerSymbol: number | undefined
+  winnerSymbol: string | undefined
 }
 
-function calculateWinner(squares: Array<number>): Winner {
+function calculateWinner(squares: Array<string | undefined>): Winner {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -143,4 +155,4 @@ function calculateWinner(squares: Array<number>): Winner {
   return { winnerSquares: undefined, winnerSymbol: undefined }
 }
 // ========================================
-export default Game
+export { Game }

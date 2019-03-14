@@ -1,4 +1,7 @@
-import Game from './Game';
+import * as React from 'react'
+import { render } from 'react-dom'
+
+import { Game } from './Game';
 // ========================================
 
-ReactDOM.render(<Game />, document.getElementById('root') as HTMLElement)
+render(<Game />, document.getElementById('root') as HTMLElement)
