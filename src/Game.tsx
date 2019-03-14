@@ -28,22 +28,6 @@ class Game extends React.Component<{}, State> {
     isDescendingSorted: true
   }
 
-  // constructor(props: Game) {
-  //   /* Calling 'super' is mandatory in a constructor of a subclass */
-  //   super(props)
-  //   this.state = {
-  //     history: [
-  //       {
-  //         squares: Array(9).fill(undefined),
-  //         squareIndex: -1
-  //       }
-  //     ],
-  //     stepNumber: 0,
-  //     xIsNext: true,
-  //     isDescendingSorted: true
-  //   }
-  // }
-
   nextPlayer(): string {
     return this.state.xIsNext ? 'X' : 'O'
   }
