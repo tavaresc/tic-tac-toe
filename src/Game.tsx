@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useState } from 'react' 
 import './index.css'
 import { Board } from './Board'
 
@@ -14,53 +15,43 @@ export type State = {
   isDescendingSorted: boolean
 }
 
-class Game extends React.Component<{}, State> {
-  state: Readonly<State> = {
-    history: [
-      {
-        squares: [],
-        squareIndex: -1
-      }
-    ],
-    stepNumber: 0,
-    xIsNext: true,
-    isDescendingSorted: true
+function Game() {
+  const initialHistory: Array<HistoryElem> = [{squares: [], squareIndex: -1}]
+  
+  const [history, setHistory] = useState(initialHistory)
+  const [stepNumber, setStepNumber] = useState(0)
+  const [xIsNext, setXIsNext] = useState(true)
+  const [isDescendingSorted, setIsDescendingSorted] = useState(true)
+
+  function nextPlayer(): string {
+    return xIsNext ? 'X' : 'O'
   }
 
-  nextPlayer(): string {
-    return this.state.xIsNext ? 'X' : 'O'
-  }
-
-  handleClick(i: number) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1)
-    const current = history[history.length - 1]
-    const squares = current.squares.slice()
+  function handleClick(i: number): void {
+    const currentHistory = history.slice(0, stepNumber + 1)
+    const current = currentHistory[currentHistory.length - 1]
+    let squares = current.squares.slice()
 
     if (calculateWinner(squares).winnerSymbol) return
-    squares[i] = this.nextPlayer()
-    this.setState({
-      history: history.concat([{ squares: squares, squareIndex: i }]),
-      stepNumber: history.length,
-      xIsNext: !this.state.xIsNext
-    })
+
+    squares[i] = nextPlayer()
+
+    setHistory(currentHistory.concat([{ squares: squares, squareIndex: i }]))
+    setStepNumber(currentHistory.length)
+    setXIsNext(!xIsNext)
   }
 
-  jumpTo(step: number) {
-    this.setState({
-      stepNumber: step,
-      xIsNext: step % 2 === 0
-    })
+  function jumpTo(step: number): void {
+    setStepNumber(step)
+    setXIsNext(step % 2 === 0)
   }
 
-  sortMoves() {
-    this.setState({ isDescendingSorted: !this.state.isDescendingSorted })
+  function sortMoves(): void {
+    setIsDescendingSorted(!isDescendingSorted)
   }
 
-  render() {
-    const history = this.state.history
-    const stepNumber = this.state.stepNumber
-    const current = history[stepNumber]
-    const { winnerSquares, winnerSymbol } = calculateWinner(current.squares as string[])
+    const currentHistory = history[stepNumber]
+    const { winnerSquares, winnerSymbol } = calculateWinner(currentHistory.squares as string[])
 
     const moves = history.map((step, move) => {
       const desc = move ? 'Go to move #' + move : 'Go to game start'
@@ -72,7 +63,7 @@ class Game extends React.Component<{}, State> {
         <li key={move}>
           <button
             className={move === stepNumber ? 'selected-item' : ''}
-            onClick={() => this.jumpTo(move)}
+            onClick={() => jumpTo(move)}
           >
             {desc} ({col}, {row})
           </button>
@@ -85,28 +76,27 @@ class Game extends React.Component<{}, State> {
       ? 'Winner: ' + winnerSymbol
       : stepNumber === maxStepNumber
       ? 'Draw result'
-      : 'Next player: ' + this.nextPlayer()
+      : 'Next player: ' + nextPlayer()
 
-    const isDescendingSorted = this.state.isDescendingSorted
     return (
       <div className="game">
         <div className="game-board">
           <Board
-            squares={current.squares}
+            squares={currentHistory.squares}
             winnerSquares={winnerSquares}
-            onClick={i => this.handleClick(i)}
+            onClick={i => handleClick(i)}
           />
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <button onClick={() => this.sortMoves()}>
+          <button onClick={() => sortMoves()}>
             {isDescendingSorted ? 'Ascending sort' : 'Descending sort'}
           </button>
           <ol>{isDescendingSorted ? moves : moves.reverse()}</ol>
         </div>
       </div>
     )
-  }
+  
 }
 
 type Winner = {
