@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState } from 'react' 
+import { useState } from 'react'
 import './index.css'
 import { Board } from './Board'
 
@@ -15,7 +15,7 @@ export type State = {
   isDescendingSorted: boolean
 }
 
-const initialHistory: Array<HistoryElem> = [{squares: [], squareIndex: -1}]
+const initialHistory: Array<HistoryElem> = [{ squares: [], squareIndex: -1 }]
 
 function Game() {
   const [history, setHistory] = useState(initialHistory)
@@ -50,53 +50,63 @@ function Game() {
     setIsDescendingSorted(!isDescendingSorted)
   }
 
-    const currentHistory = history[stepNumber]
-    const { winnerSquares, winnerSymbol } = calculateWinner(currentHistory.squares as string[])
+  const currentHistory = history[stepNumber]
+  const { winnerSquares, winnerSymbol } = calculateWinner(
+    currentHistory.squares as string[]
+  )
 
-    const moves = history.map((step, move) => {
-      const desc = move ? 'Go to move #' + move : 'Go to game start'
-      const col = step.squareIndex > -1 ? step.squareIndex % 3 : 'col'
-      const row =
-        step.squareIndex > -1 ? Math.floor(step.squareIndex / 3) : 'row'
+  const moves = history.map((step, move) => renderMove(step, move))
 
-      return (
-        <li key={move}>
-          <button
-            className={move === stepNumber ? 'selected-item' : ''}
-            onClick={() => jumpTo(move)}
-          >
-            {desc} ({col}, {row})
-          </button>
-        </li>
-      )
-    })
+  function renderMove(step: HistoryElem, move: number) {
+    const desc = move ? 'Go to move #' + move : 'Go to game start'
+    const col = step.squareIndex > -1 ? step.squareIndex % 3 : 'col'
+    const row = step.squareIndex > -1 ? Math.floor(step.squareIndex / 3) : 'row'
 
-    const maxStepNumber = history[0].squares.length
-    const status = winnerSymbol
-      ? 'Winner: ' + winnerSymbol
-      : stepNumber === maxStepNumber
-      ? 'Draw result'
-      : 'Next player: ' + nextPlayer()
+    function onSquareClick() {
+      jumpTo(move)
+    }
 
     return (
-      <div className="game">
-        <div className="game-board">
-          <Board
-            squares={currentHistory.squares}
-            winnerSquares={winnerSquares}
-            onClick={i => handleClick(i)}
-          />
-        </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <button onClick={() => sortMoves()}>
-            {isDescendingSorted ? 'Ascending sort' : 'Descending sort'}
-          </button>
-          <ol>{isDescendingSorted ? moves : moves.reverse()}</ol>
-        </div>
-      </div>
+      <li key={move}>
+        <button
+          className={move === stepNumber ? 'selected-item' : ''}
+          onClick={onSquareClick}
+        >
+          {desc} ({col}, {row})
+        </button>
+      </li>
     )
-  
+  }
+
+  const maxStepNumber = history[0].squares.length
+  const status = winnerSymbol
+    ? 'Winner: ' + winnerSymbol
+    : stepNumber === maxStepNumber
+    ? 'Draw result'
+    : 'Next player: ' + nextPlayer()
+
+  function onBoardClick(i: number) {
+    handleClick(i)
+  }
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board
+          squares={currentHistory.squares}
+          winnerSquares={winnerSquares}
+          onClick={onBoardClick}
+        />
+      </div>
+      <div className="game-info">
+        <div>{status}</div>
+        <button onClick={() => sortMoves()}>
+          {isDescendingSorted ? 'Ascending sort' : 'Descending sort'}
+        </button>
+        <ol>{isDescendingSorted ? moves : moves.reverse()}</ol>
+      </div>
+    </div>
+  )
 }
 
 type Winner = {

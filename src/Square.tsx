@@ -9,11 +9,11 @@ export type Props = {
 }
 
 function Square(props: Props) {
-  const { value, winner, reactKey } = props
+  const { value, winner, reactKey, onClick } = props
   const className = winner ? 'winner-square' : 'square'
 
   return (
-    <button key={reactKey} className={className} onClick={props.onClick}>
+    <button key={reactKey} className={className} onClick={onClick}>
       {value}
     </button>
   )

@@ -3,21 +3,28 @@ import './index.css'
 import { Square } from './Square'
 import { range } from 'fp-ts/lib/Array'
 
-export interface Props {
+export type Props = {
   squares: Array<string | undefined>
   winnerSquares: Array<number> | undefined
   onClick(index: number): void
 }
 
 function Board(props: Props) {
+  const { onClick, squares } = props
+
   function renderSquare(isWinnerSquare: boolean, i: number) {
+
+    function onPropsClick() {
+      onClick(i)
+    }
+
     return (
       <Square
         reactKey={i}
         key={i}
-        value={props.squares[i]}
+        value={squares[i]}
         winner={isWinnerSquare}
-        onClick={() => props.onClick(i)}
+        onClick={onPropsClick}
       />
     )
   }
@@ -37,7 +44,7 @@ function Board(props: Props) {
       })
 
       return (
-        <div key={'row' + i} className="board-row">
+        <div key={i} className="board-row">
           {row}
         </div>
       )
