@@ -5,7 +5,7 @@ export type Props = {
   value: string | undefined
   winner: boolean
   onClick: () => void
-  reactKey: string
+  reactKey: number
 }
 
 function Square(props: Props) {
