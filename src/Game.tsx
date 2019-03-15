@@ -15,9 +15,9 @@ export type State = {
   isDescendingSorted: boolean
 }
 
+const initialHistory: Array<HistoryElem> = [{squares: [], squareIndex: -1}]
+
 function Game() {
-  const initialHistory: Array<HistoryElem> = [{squares: [], squareIndex: -1}]
-  
   const [history, setHistory] = useState(initialHistory)
   const [stepNumber, setStepNumber] = useState(0)
   const [xIsNext, setXIsNext] = useState(true)
