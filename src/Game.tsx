@@ -85,17 +85,13 @@ function Game() {
     ? 'Draw result'
     : 'Next player: ' + nextPlayer()
 
-  function onBoardClick(i: number) {
-    handleClick(i)
-  }
-
   return (
     <div className="game">
       <div className="game-board">
         <Board
           squares={currentHistory.squares}
           winnerSquares={winnerSquares}
-          onClick={onBoardClick}
+          onClick={handleClick}
         />
       </div>
       <div className="game-info">
