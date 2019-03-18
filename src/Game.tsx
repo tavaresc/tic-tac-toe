@@ -91,6 +91,8 @@ function Game() {
         <Board
           squares={currentHistory.squares}
           winnerSquares={winnerSquares}
+          // use function call instead of arrow function to avoid evaluation 
+          // each time Game is rendered (instead, it only evaluates when Board state changes)
           onClick={handleClick}
         />
       </div>
